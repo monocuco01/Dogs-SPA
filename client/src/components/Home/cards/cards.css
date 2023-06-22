@@ -46,3 +46,14 @@
   background-color: #ff9600;
   box-shadow: 1px 1px 1px #ff9600;
 }
+.cargando {
+  height: 82.5vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cargando p {
+  font-size: 80px;
+}

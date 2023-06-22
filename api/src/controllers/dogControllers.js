@@ -1,7 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 const { Dog, Temper } = require("../db");
-const { Op } = require("sequelize");
+const { Op, and } = require("sequelize");
 
 const { API_KEY } = process.env;
 
@@ -10,6 +10,7 @@ module.exports = {
     const result = await axios(
       `https://api.thedogapi.com/v1/breeds/?api_key=${API_KEY}`
     );
+
     let dbDogs = await Dog.findAll({
       include: {
         model: Temper,
@@ -34,19 +35,26 @@ module.exports = {
         origin: "api",
       };
     });
+
     dbDogs = dbDogs.map((dog) => {
+      const tempers = dog.Tempers.map((temper) => temper.name);
+      const temperString = tempers.join(", ");
+
       return {
         id: dog.id,
         image: dog.image,
         name: dog.name,
         weight: dog.weight,
-        temper: dog.Temper,
+        temper: temperString,
         origin: dog.origin,
       };
     });
+
     data = [...dbDogs, ...data];
+
     return data;
   },
+
   getDetail: async (id) => {
     try {
       const dogDB = await Dog.findByPk(id, {
@@ -60,13 +68,24 @@ module.exports = {
       });
 
       if (dogDB) {
-        return dogDB;
+        const tempers = dogDB.Tempers.map((temper) => temper.name);
+        const temperString = tempers.join(", ");
+
+        const detail = {
+          id: dogDB.id,
+          image: dogDB.image,
+          name: dogDB.name,
+          height: dogDB.height,
+          weight: dogDB.weight,
+          temper: temperString,
+          life_span: dogDB.life_span,
+        };
+
+        return detail;
       } else {
         throw new Error("Dog not found in database");
       }
     } catch (error) {
-      // If the search in the DB fails, then we look in the API.
-
       const dogApi = await axios(
         `https://api.thedogapi.com/v1/breeds/${id}/?api_key=${API_KEY}`
       );
@@ -111,12 +130,15 @@ module.exports = {
     let data = [...dogsApi.data];
 
     dogs = dogs.map((dog) => {
+      const tempers = dog.Tempers.map((temper) => temper.name);
+      const temperString = tempers.join(", ");
+
       return {
         id: dog.id,
         image: dog.image,
         name: dog.name,
-        temper: dog.tempers,
         weight: dog.weight,
+        temper: temperString,
         origin: dog.origin,
       };
     });
@@ -142,11 +164,12 @@ module.exports = {
     if (!dogs && !data) throw Error("Something went wrong");
   },
   createDog: async (name, image, height, weight, life_span, temper) => {
-    if (!name || !image || !height || !weight || !life_span || !temper)
-      throw new Error("pailas, te faltan datos");
+    if (!name || !image || !height || !weight || !life_span || !temper.length)
+      throw new Error("Missing data");
 
     const newDog = await Dog.create({ name, image, height, weight, life_span });
     await newDog.addTemper(temper);
+
     return newDog;
   },
 };

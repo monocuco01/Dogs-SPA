@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "./form.css";
-import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { createDog, validateName } from "../../redux/actions";
 
 const Form = ({ onClose }) => {
   const [isClosing, setIsClosing] = useState(false);
+  const dispatch = useDispatch();
 
   const handleClose = () => {
     setIsClosing(true);
@@ -12,39 +13,71 @@ const Form = ({ onClose }) => {
       onClose();
     }, 300);
   };
-  const [form, setForm] = useState({
+
+  const [formData, setFormData] = useState({
     name: "",
-    picture: "",
-    minHeight: "",
-    maxHeight: "",
-    minWeight: "",
-    maxWeight: "",
-    lifespan: "",
-    temperament: [],
+    image: "",
+    height: "",
+    weight: "",
+    lifeSpan: "",
+    temper: [],
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm({
-      ...form,
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "name") {
+      dispatch(validateName(value));
+    }
+
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
-  const handleSutmit = (e) => {
-    e.preventDefault();
-    axios.post("http://localhost:3001/dogs", form).then((res) => {
-      alert(res.data);
+  const handleSelectChange = (event) => {
+    const selectedOption = Number(event.target.value);
+    setFormData((prevData) => ({
+      ...prevData,
+      temper: [...prevData.temper, selectedOption],
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    dispatch(createDog(formData));
+
+    setFormData({
+      name: "",
+      image: "",
+      height: "",
+      weight: "",
+      lifeSpan: "",
+      temper: [],
     });
   };
 
   const tempers = useSelector((state) => state.temper);
+
+  const selectedTemperaments = formData.temper.map((tempId) => {
+    const temp = tempers.find((temp) => temp.id === tempId);
+    return temp ? temp.name : "";
+  });
+
+  const nameValid = useSelector((state) => state.nameValid);
+  const isNameEmpty = formData.name.trim().length === 0;
   return (
     <>
-      <div className="overlay "></div>
+      <div className="overlay"></div>
       <div className={`form-popup ${isClosing ? "closing" : ""}`}>
-        <form className="form" onSubmit={handleSutmit}>
+        <form className="form" onSubmit={handleSubmit}>
           <div className="boton_cerrar_prueba">
+            {!isNameEmpty && !nameValid && (
+              <div className="outside-error-message">
+                <p>Name should only contain letters</p>
+              </div>
+            )}
             <button
               type="button"
               className="form-close-button"
@@ -64,109 +97,89 @@ const Form = ({ onClose }) => {
             className="form-input"
             required
             placeholder="Snoopy."
-            value={form.name}
-            onChange={handleInputChange}
+            value={formData.name}
+            onChange={handleChange}
           />
 
-          <label htmlFor="picture" className="form-label">
-            Picture:
+          <label htmlFor="image" className="form-label">
+            Image URL:
           </label>
           <input
             type="text"
-            id="picture"
-            name="picture"
+            id="image"
+            name="image"
             className="form-input"
             required
             placeholder="Picture URL"
-            value={form.picture}
-            onChange={handleInputChange}
+            value={formData.image}
+            onChange={handleChange}
           />
 
-          <label htmlFor="minHeight" className="form-label">
-            Minimum Height:
+          <label htmlFor="height" className="form-label">
+            Height:
           </label>
           <input
-            type="number"
-            id="minHeight"
-            name="minHeight"
+            type="text"
+            id="height"
+            name="height"
             className="form-input"
             required
-            placeholder="20"
-            value={form.minHeight}
-            onChange={handleInputChange}
+            placeholder="30-420 cm"
+            value={formData.height}
+            onChange={handleChange}
           />
 
-          <label htmlFor="maxHeight" className="form-label">
-            Maximum Height:
+          <label htmlFor="weight" className="form-label">
+            Weight:
           </label>
           <input
-            type="number"
-            id="maxHeight"
-            name="maxHeight"
+            type="text"
+            id="weight"
+            name="weight"
             className="form-input"
             required
-            placeholder="50"
-            value={form.maxHeight}
-            onChange={handleInputChange}
+            placeholder="18-253 kg"
+            value={formData.weight}
+            onChange={handleChange}
           />
 
-          <label htmlFor="minWeight" className="form-label">
-            Minimum Weight:
-          </label>
-          <input
-            type="number"
-            id="minWeight"
-            name="minWeight"
-            className="form-input"
-            required
-            placeholder="15"
-            value={form.minWeight}
-            onChange={handleInputChange}
-          />
-
-          <label htmlFor="maxWeight" className="form-label">
-            Maximum Weight:
-          </label>
-          <input
-            type="number"
-            id="maxWeight"
-            name="maxWeight"
-            className="form-input"
-            required
-            placeholder="35"
-            value={form.maxWeight}
-            onChange={handleInputChange}
-          />
-
-          <label htmlFor="lifespan" className="form-label">
+          <label htmlFor="lifeSpan" className="form-label">
             Lifespan:
           </label>
           <input
             type="text"
-            id="lifespan"
-            name="lifespan"
+            id="lifeSpan"
+            name="lifeSpan"
             className="form-input"
             required
-            placeholder="0-15 years"
-            value={form.lifespan}
-            onChange={handleInputChange}
+            placeholder="0-25 years"
+            value={formData.lifeSpan}
+            onChange={handleChange}
           />
 
-          <label htmlFor="temperaments" className="form-label">
+          <label htmlFor="temper" className="form-label">
             Temperaments:
           </label>
           <select
             className="form-select"
-            name="temperament"
-            value={form.temperament}
-            onChange={handleInputChange}
+            name="temper"
+            value=""
+            onChange={handleSelectChange}
           >
+            <option value="">Select an option</option>
             {tempers.map((temp) => (
               <option key={temp.id} value={temp.id}>
                 {temp.name}
               </option>
             ))}
           </select>
+
+          <div className="selected-temper">
+            <label className="form-label">Selected Temperaments:</label>{" "}
+            {selectedTemperaments.map((temperamentis) => (
+              <p>{temperamentis}</p>
+            ))}
+          </div>
 
           <div className="pruebasutmit">
             <button type="submit" className="form-button">

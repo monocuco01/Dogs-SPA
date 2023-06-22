@@ -40,6 +40,7 @@ sequelize.models = Object.fromEntries(capsEntries);
 const { Dog, Temper } = sequelize.models;
 
 // Associations
+
 Dog.belongsToMany(Temper, { through: "dogTemper" });
 Temper.belongsToMany(Dog, { through: "dogTemper" });
 

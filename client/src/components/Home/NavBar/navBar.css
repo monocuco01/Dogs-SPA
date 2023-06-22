@@ -5,6 +5,10 @@
   box-sizing: border-box;
   /* Agrega más estilos aquí según tus necesidades */
 }
+a {
+  text-decoration: none;
+  margin-top: 1px;
+}
 .container_Navbar {
   display: flex;
   height: 60px;

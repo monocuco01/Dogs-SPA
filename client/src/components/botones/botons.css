@@ -18,7 +18,7 @@
   background-color: #37745b;
   color: white;
   border: none;
-  margin-right: 10px;
+
   cursor: pointer;
 }
 
@@ -32,7 +32,7 @@
   background-color: #37745b;
   color: white;
   border: none;
-  margin-left: 50px;
+  margin-left: 100px;
   cursor: pointer;
 }
 .boton_create:hover {

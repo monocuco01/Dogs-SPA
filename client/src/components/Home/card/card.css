@@ -1,11 +1,10 @@
 .carta img {
   width: 230px;
   height: 230px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin: 20px;
   border-radius: 5px;
+  object-fit: cover;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .carta {
@@ -18,18 +17,19 @@
   width: 280px;
   padding: 10px;
   border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
 .carta:hover {
   background-color: #344648;
-  box-shadow: 1px 1px 1px #344648;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
 .carta p {
   margin: 8px;
   margin-left: 15px;
   margin-right: 15px;
   color: aliceblue;
-}
-
-.carta:hover {
-  box-shadow: 2px 2px 2px #344648;
+  font-size: 16px;
+  line-height: 1.5;
 }

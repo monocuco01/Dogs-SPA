@@ -4,7 +4,7 @@ import "./home.css";
 import NavBar from "./NavBar/NavBar";
 import Botons from "../botones/Botons";
 import { useDispatch } from "react-redux";
-import { getDogs, getTemp, getDogName } from "../../redux/actions";
+import { getDogs, getTemp, getDogName, getDog } from "../../redux/actions";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -12,6 +12,7 @@ const Home = () => {
     dispatch(getDogs());
     dispatch(getTemp());
     dispatch(getDogName());
+    dispatch(getDog());
   }, [dispatch]);
 
   return (

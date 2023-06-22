@@ -20,6 +20,7 @@ router.get("/dogs", async (req, res) => {
 });
 router.post("/dogs", async (req, res) => {
   const { name, image, height, weight, lifeSpan, temper } = req.body;
+
   try {
     const newDog = await dogControllers.createDog(
       name,
@@ -29,7 +30,8 @@ router.post("/dogs", async (req, res) => {
       lifeSpan,
       temper
     );
-    res.status(201).json(newDog);
+
+    res.status(201).json("new dog create");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
